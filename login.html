@@ -1,0 +1,287 @@
+<!-- /c:/Users/girid/Dented-Code Projects/Node/login.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign in — Dented Code</title>
+    <meta name="description" content="Clean, accessible login page with client-side validation" />
+    <style>
+        :root{
+            --bg:#0f1724; --card:#0b1220; --accent:#4f46e5; --muted:#93a5c7;
+            --glass: rgba(255,255,255,0.04);
+            --success:#10b981; --danger:#ef4444;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color-scheme: dark;
+        }
+        * { box-sizing: border-box; }
+        html,body { height:100%; margin:0; background:
+            radial-gradient(1200px 600px at 10% 10%, rgba(79,70,229,0.12), transparent),
+            radial-gradient(900px 400px at 90% 80%, rgba(16,185,129,0.06), transparent),
+            var(--bg);
+            -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+        }
+        main { min-height:100%; display:grid; place-items:center; padding:48px 18px; }
+
+        .card {
+            width:min(980px, 96%);
+            background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border-radius:14px;
+            overflow:hidden;
+            display:grid;
+            grid-template-columns: 1fr 420px;
+            box-shadow: 0 20px 50px rgba(2,6,23,0.6);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        @media (max-width:880px){ .card { grid-template-columns: 1fr; } .art { display:none; } }
+
+        .art{
+            background: linear-gradient(180deg, rgba(79,70,229,0.12), rgba(16,185,129,0.03));
+            padding:40px; display:flex; gap:20px; align-items:center; justify-content:center; flex-direction:column;
+        }
+        .art h2 { margin:0; font-weight:700; font-size:28px; color: #e6eef9; }
+        .art p{ margin:0; color:var(--muted); max-width:340px; text-align:center; font-size:14px; line-height:1.4; }
+
+        .form-wrap { padding:36px; display:flex; align-items:center; justify-content:center; }
+        form {
+            width:100%; max-width:420px; color:#eaf0ff;
+        }
+        .brand { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
+        .logo {
+            width:42px; height:42px; border-radius:9px; background:linear-gradient(135deg,var(--accent), #06b6d4);
+            display:grid; place-items:center; font-weight:700; color:white; font-size:18px; box-shadow:0 6px 18px rgba(79,70,229,0.2);
+        }
+        .brand h1 { font-size:16px; margin:0; }
+        .brand p { margin:0; font-size:13px; color:var(--muted); }
+
+        .muted { color:var(--muted); font-size:13px; margin-top:6px; }
+
+        .oauth {
+            display:flex; gap:10px; margin-bottom:16px;
+        }
+        .btn {
+            --bg: rgba(255,255,255,0.04);
+            background:var(--bg);
+            border:1px solid rgba(255,255,255,0.06);
+            color: #eaf0ff;
+            padding:10px 12px; border-radius:9px; display:inline-flex; gap:8px; align-items:center;
+            width:100%; justify-content:center; cursor:pointer; font-weight:600;
+        }
+        .btn:active { transform:translateY(1px); }
+        .btn.secondary { background:transparent; border:1px dashed rgba(255,255,255,0.05); color:var(--muted); }
+
+        .separator { display:flex; align-items:center; gap:12px; margin:16px 0; font-size:13px; color:var(--muted); }
+        .separator::before, .separator::after { content:""; flex:1; height:1px; background: rgba(255,255,255,0.03); border-radius:1px; }
+
+        label { font-size:13px; display:block; margin-bottom:8px; color:#eaf0ff; font-weight:600; }
+        .field { display:block; margin-bottom:14px; position:relative; }
+        input[type="email"], input[type="password"]{
+            width:100%; padding:12px 40px 12px 12px; border-radius:9px; background:var(--glass); border:1px solid rgba(255,255,255,0.04); color:#eaf0ff; font-size:14px;
+            outline:none; transition:box-shadow .12s, border-color .12s, transform .08s;
+        }
+        input:focus { box-shadow: 0 6px 18px rgba(79,70,229,0.16); border-color: rgba(79,70,229,0.45); transform: translateY(-1px); }
+
+        .icon {
+            position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:auto; color:var(--muted); display:flex; align-items:center; gap:8px;
+        }
+        .show-pass { cursor:pointer; user-select:none; padding:6px 8px; border-radius:8px; transition:background .12s; }
+        .show-pass:hover { background: rgba(255,255,255,0.02); }
+
+        .row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+        .checkbox {
+            display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-size:14px;
+        }
+
+        .submit { margin-top:6px; width:100%; padding:12px; font-weight:700; background:linear-gradient(90deg,var(--accent), #06b6d4); color:white; border:none; border-radius:10px; cursor:pointer; box-shadow:0 10px 30px rgba(79,70,229,0.2); }
+        .submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:none; }
+
+        .helper { margin-top:14px; font-size:13px; color:var(--muted); }
+
+        .msg {
+            display:none; padding:12px; border-radius:8px; margin-bottom:12px; font-size:13px; line-height:1.25;
+        }
+        .msg.show { display:block; }
+        .msg.error { background: linear-gradient(180deg, rgba(239,68,68,0.08), transparent); border:1px solid rgba(239,68,68,0.12); color: #ffdcdc; }
+        .msg.success { background: linear-gradient(180deg, rgba(16,185,129,0.06), transparent); border:1px solid rgba(16,185,129,0.08); color:#dffae6; }
+
+        small.note { color:var(--muted); font-size:12px; display:block; margin-top:8px; }
+
+        footer.card-foot { padding:14px 18px; background: rgba(255,255,255,0.01); font-size:13px; color:var(--muted); border-top:1px solid rgba(255,255,255,0.02); text-align:center; }
+        a.link { color:var(--accent); text-decoration:none; font-weight:600; }
+        a.link:focus { outline:2px dashed rgba(79,70,229,0.35); outline-offset:3px; border-radius:4px; }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="card" aria-labelledby="signin-title">
+            <aside class="art" aria-hidden="false">
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="0" y="0" width="120" height="120" rx="18" fill="url(#g)"/>
+                    <defs>
+                        <linearGradient id="g" x1="0" x2="120" y1="0" y2="120" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#4F46E5" stop-opacity="0.96"/>
+                            <stop offset="1" stop-color="#06B6D4" stop-opacity="0.9"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div style="max-width:420px;">
+                    <h2>Dented Code</h2>
+                    <p>Smart, secure login — built for local development. This page demonstrates accessible form controls, client-side validation, and a polished layout you can drop into your project and adapt.</p>
+                </div>
+            </aside>
+
+            <div class="form-wrap">
+                <form id="loginForm" novalidate>
+                    <div class="brand">
+                        <div class="logo" aria-hidden="true">DC</div>
+                        <div>
+                            <h1 id="signin-title">Sign in to your account</h1>
+                            <p class="muted">Welcome back — please enter your details.</p>
+                        </div>
+                    </div>
+
+                    <div id="message" role="status" aria-live="polite" class="msg" hidden></div>
+
+                    <div class="oauth" aria-hidden="true">
+                        <button type="button" class="btn" title="Sign in with Google">
+                            <svg width="18" height="18" viewBox="0 0 533.5 544.3" aria-hidden="true" focusable="false">
+                                <path fill="#4285F4" d="M533.5 278.4c0-18.5-1.6-37.6-4.9-55.6H272v105.3h147.4c-6.4 34.8-25.8 64.3-55 84.1l88.9 69.3c51.9-47.9 80.2-118.4 80.2-203.1z"/>
+                                <path fill="#34A853" d="M272 544.3c74.2 0 136.4-24.6 181.9-66.9l-88.9-69.3c-24.7 16.6-56.2 26.4-93 26.4-71.6 0-132.3-48.2-154.1-112.7l-92.6 71.4c44.6 88.3 136.4 151.1 246.7 151.1z"/>
+                                <path fill="#FBBC05" d="M117.9 321.8c-10.3-30.9-10.3-64.6 0-95.5L25.3 154.8C-14.4 230.5-14.4 312.3 25.3 388l92.6-66.2z"/>
+                                <path fill="#EA4335" d="M272 109.6c39.6 0 75.2 13.6 103.2 40.4l77.2-77.2C403.9 29 344.3 0 272 0 162.2 0 70.3 62.7 25.3 154.8l92.6 71.4C139.7 158 200.4 109.6 272 109.6z"/>
+                            </svg>
+                            Google
+                        </button>
+                        <button type="button" class="btn secondary" title="Sign in with email">
+                            Email
+                        </button>
+                    </div>
+
+                    <div class="separator">or continue with your email</div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" inputmode="email" autocomplete="username" placeholder="you@provider.com" required aria-describedby="emailHelp" />
+                        <small id="emailHelp" class="note">We'll never share your email. Use a valid address.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="6" required aria-describedby="passHelp" />
+                        <div class="icon">
+                            <button type="button" class="show-pass" id="togglePass" aria-pressed="false" aria-label="Show password">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M12 5c4 0 7.3 2.5 9 7-1.7 4.5-5 7-9 7s-7.3-2.5-9-7c1.7-4.5 5-7 9-7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <small id="passHelp" class="note">Min 6 characters. Use a mix of letters and numbers for better security.</small>
+                    </div>
+
+                    <div class="row" style="margin-top:4px;">
+                        <label class="checkbox">
+                            <input id="remember" name="remember" type="checkbox" style="accent-color:var(--accent)" />
+                            Remember me
+                        </label>
+                        <div style="font-size:13px;">
+                            <a href="#" class="link" id="forgot">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <button id="submitBtn" class="submit" type="submit">Sign in</button>
+
+                    <div class="helper">
+                        New here? <a href="#" class="link">Create an account</a>
+                    </div>
+
+                    <small style="display:block; margin-top:12px; color:var(--muted);">This page only simulates sign-in in the browser. Hook the form up to your backend / auth provider to complete authentication.</small>
+                </form>
+            </div>
+
+            <footer class="card-foot" aria-hidden="false">
+                Built with care • © <span id="year"></span> Dented Code
+            </footer>
+        </section>
+    </main>
+
+    <script>
+        // Small client-side form logic. Replace with real auth calls in your app.
+        const form = document.getElementById('loginForm');
+        const msg = document.getElementById('message');
+        const pass = document.getElementById('password');
+        const toggle = document.getElementById('togglePass');
+        const submitBtn = document.getElementById('submitBtn');
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        toggle.addEventListener('click', () => {
+            const shown = pass.type === 'text';
+            pass.type = shown ? 'password' : 'text';
+            toggle.setAttribute('aria-pressed', String(!shown));
+            toggle.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+        });
+
+        function showMessage(text, type='error'){
+            msg.hidden = false;
+            msg.className = 'msg show ' + (type === 'success' ? 'success' : 'error');
+            msg.textContent = text;
+        }
+        function clearMessage(){
+            msg.hidden = true;
+            msg.className = 'msg';
+            msg.textContent = '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessage();
+
+            // Basic constraint validation
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Example client-side validation / feedback
+            const email = form.email.value.trim();
+            const password = form.password.value;
+
+            // Fake validation: reject common weak password and demo user
+            if (password.length < 6) {
+                showMessage('Your password must be at least 6 characters.');
+                form.password.focus();
+                return;
+            }
+
+            // Simulate network request
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in…';
+            await new Promise(resolve => setTimeout(resolve, 900));
+
+            // Demo: accept addresses ending with example.com or accept specific pair
+            if (email.toLowerCase().endsWith('@example.com') || (email==='demo@local' && password==='password')) {
+                showMessage('Signed in successfully — redirecting…', 'success');
+                // simulate redirect
+                setTimeout(() => {
+                    // Replace with location.href = '/dashboard' in real app
+                    showMessage('Redirect simulated. Replace this code with a real redirect.', 'success');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Sign in';
+                }, 900);
+            } else {
+                showMessage('Invalid credentials. Try a demo account (demo@local / password) or use @example.com.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign in';
+            }
+        });
+
+        // keyboard accessibility: toggle password with enter when focused
+        toggle.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                toggle.click();
+            }
+        });
+    </script>
+</body>
+</html>
